@@ -5,38 +5,66 @@ const string priorities = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 int GetPriority(char x)
 {
-    for (int index = 0; index < priorities.Length; index++)
+    for (int i = 0; i < priorities.Length; i++)
     {
-        if (priorities[index] == x) return index + 1;
+        if (priorities[i] == x) return i + 1;
     }
     return 0;
 }
 
-var inputs = File.ReadAllText("./data/input.txt")
+var inputLines = File.ReadAllText("./data/input.txt")
                  .Split('\n')
-                 .Select(line => (line?.Trim()) ?? string.Empty);
+                 .Select(line => (line?.Trim()) ?? string.Empty)
+                 .ToArray();
 
-Debug.WriteLine($"Found {inputs.Count()} inputs");
+Debug.WriteLine($"Found {inputLines.Count()} inputs");
 
-int totalSum = 0;
+Debug.WriteLine($"Part One Total Sum: {PartOne()}");
+Debug.WriteLine($"Part Two Total Sum: {PartTwo()}");
 
-foreach (var input in inputs)
+
+int PartOne()
 {
-    var items = input.ToArray();
-    var itemCount = items.Length / 2;
+    int totalSum = 0;
 
-    var itemsA = input.Take(itemCount).ToArray();
-    var itemsB = input.Skip(itemCount).Take(itemCount).ToArray();
+    foreach (var input in inputLines)
+    {
+        var items = input.ToArray();
+        var itemCount = items.Length / 2;
 
-    var commonItems = itemsA.Where(i => itemsB.Contains(i)).Distinct().ToArray();
-    Debug.WriteLine($" - Common items: {commonItems.ToDisplayString()}");
+        var itemsA = input.Take(itemCount).ToArray();
+        var itemsB = input.Skip(itemCount).Take(itemCount).ToArray();
 
-    int inputSum = 0;
-    foreach (var item in commonItems)
-        inputSum += GetPriority(item);
+        var commonItems = itemsA.Where(i => itemsB.Contains(i)).Distinct().ToArray();
 
-    totalSum += inputSum;
-    Debug.WriteLine($"Current Sum: {inputSum}; Total Sum: {totalSum}");
+        int inputSum = 0;
+        foreach (var item in commonItems)
+            inputSum += GetPriority(item);
+
+        totalSum += inputSum;
+    }
+
+    return totalSum;
 }
 
+int PartTwo()
+{
+    int totalSum = 0;
 
+    for (int index = 0; index + 3 < inputLines.Length; index += 3)
+    {
+        char[] itemsA = inputLines[index].ToArray();
+        char[] itemsB = inputLines[index + 1].ToArray();
+        char[] itemsC = inputLines[index + 2].ToArray();
+
+        var commonItems = itemsA.Intersect(itemsB).Intersect(itemsC);
+
+        int inputSum = 0;
+        foreach (var item in commonItems)
+            inputSum += GetPriority(item);
+
+        totalSum += inputSum;
+    }
+
+    return totalSum;
+}
